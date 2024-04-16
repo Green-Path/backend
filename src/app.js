@@ -11,37 +11,22 @@ const jwt = require("jsonwebtoken");
 app.use(express.json())
 app.use(express.urlencoded({ extended: true}))
 const port = process.env.PORT || 3000;
-app.set("view engine", "hbs")
-conectMongodb(process.env.DATABASE_URL).then(() => {
-    console.log(`Connection Successfully....`)
-}).catch((e) => {
-    x
-    console.log(`No Connection`)
-})
+
+mongoose.connect("mongodb://127.0.0.1:27017/Randome")
+  .then(() => {
+    console.log('Connected to MongoDB');
+  })
+  .catch((err) => {
+    console.error('Error connecting to MongoDB:', err);
+  });
 
 
 
 
-const Register = require("./models/users")
-
-const hbs = require('hbs')
-const ejs = require('ejs');
-const { error } = require('console');
+const users = require("./models/users")
 
 
 
-
-const static_path = path.join(__dirname, "../public")
-app.use(express.static(static_path))
-
-const template_path = path.join(__dirname, "../templates/views")
-const partialsPath=path.join(__dirname, "../templates/partials")
-app.set("views", template_path)
-
-hbs.registerPartials(partialsPath)
-
-app.set('view engine', 'ejs');
-// app.use(express.static(template_path))
 
 
 const forgotpassroute = require("./routes/forgotpassroute");
@@ -55,7 +40,7 @@ const edit_profile_route = require("./routes/edit_profile_route");
 
 
 const changepassword=require("./routes/changepassroute");
-
+const productroute=require("./routes/productroute");
 
 
 
@@ -71,7 +56,7 @@ app.use("/myprofile", myprofileroute);
 app.use("/edit_profile", edit_profile_route);
 app.use("/saved_jobs", savelistroute);
 
-
+app.use("/products",productroute);
 
 
 
@@ -79,6 +64,15 @@ app.use("/saved_jobs", savelistroute);
 app.get("/", (req, res) => {
    // res.render("landingpage.hbs")
 })
+
+app.get("/kitchen", (req, res) => {
+    
+ })
+
+ app.get("/blogs", (req, res) => {
+    
+    
+ })
 
 app.get("/logout", async(req, res) => {
     try {
