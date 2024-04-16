@@ -24,6 +24,7 @@ mongoose.connect("mongodb://127.0.0.1:27017/Randome")
 
 
 const users = require("./models/users")
+const Blog = require("./models/blogs")
 
 
 
@@ -71,7 +72,21 @@ app.get("/kitchen", (req, res) => {
 
  app.get("/blogs", (req, res) => {
     
-    
+    Blog.find({}, (err, blogs) => {
+        if (err) {
+          console.error("Error finding blogs:", err);
+          return;
+        }
+        
+        // Store the data in JSON format
+        const jsonData = blogs.map(blog => ({
+          title: blog.title,
+          text: blog.text
+        }));
+      
+        console.log(jsonData); // Output the JSON data
+      });
+
  })
 
 app.get("/logout", async(req, res) => {
