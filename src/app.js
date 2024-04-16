@@ -5,7 +5,7 @@ const cookieParser = require("cookie-parser");
 app.use(cookieParser());
 require('dotenv').config()
 const { json } = require('express')
-const { conectMongodb } = require("./db/conection");
+const { conectMongodb } = require("./db/connection");
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken");
 app.use(express.json())
