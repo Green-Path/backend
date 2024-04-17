@@ -1,108 +1,134 @@
 const express = require('express')
 const path = require('path')
 const app = express()
-const cookieParser = require("cookie-parser");
-app.use(cookieParser());
+const mongoose = require("mongoose");
+const bodyParser = require('body-parser');
+app.use(bodyParser.json());
+
 require('dotenv').config()
 const { json } = require('express')
 const { conectMongodb } = require("./db/connection");
-const bcrypt = require("bcryptjs")
-const jwt = require("jsonwebtoken");
+const cors=require('cors');
+app.use(cors({
+    origin:'*',
+    credentials:true
+}))
+
 app.use(express.json())
 app.use(express.urlencoded({ extended: true}))
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 5000;
 
 mongoose.connect("mongodb://127.0.0.1:27017/Randome")
   .then(() => {
     console.log('Connected to MongoDB');
   })
   .catch((err) => {
-    console.error('Error connecting to MongoDB:', err);
-  });
-
-
-
-
-const users = require("./models/users")
-const Blog = require("./models/blogs")
-
-
-
-
-
-const forgotpassroute = require("./routes/forgotpassroute");
-const loginroute = require("./routes/loginroute");
-const registerroute = require("./routes/registerroute");
-const homeroute = require("./routes/homeroute");
-
-const myprofileroute = require("./routes/myprofileroute");
-
-const edit_profile_route = require("./routes/edit_profile_route");
-
-
-const changepassword=require("./routes/changepassroute");
-const productroute=require("./routes/productroute");
-
-
-
-app.use("/change_password",changepassword)
-
-app.use("/forgotpass", forgotpassroute);
-app.use("/login", loginroute);
-app.use("/register", registerroute);
-app.use("/home", homeroute);
-
-app.use("/myprofile", myprofileroute);
-
-app.use("/edit_profile", edit_profile_route);
-app.use("/saved_jobs", savelistroute);
-
-app.use("/products",productroute);
+      console.error('Error connecting to MongoDB:', err);
+    });
+    
+    app.listen(port, () => {
+        console.log(`Server is running in port no ${port}`);
+    })
+    
+    
+    
+    // const users = require("./models/users")
+    const Blog = require("./models/Blogs")
+    const Product = require("./models/products")
+    
+    
+    
+    
+    
+    // const productroute=require("./routes/productroute");
+    
+    
+    // // app.use("/login", loginroute);
+    // // app.use("/register", registerroute);
+    // // app.use("/home", homeroute);
+    
+    // // app.use("/myprofile", myprofileroute);
+    
+    // // app.use("/edit_profile", edit_profile_route);
+    // // app.use("/saved_jobs", savelistroute);
+    
+    // app.use("/products",productroute);
 
 
 
 
 app.get("/", (req, res) => {
-   // res.render("landingpage.hbs")
+   res.send("helloo");
 })
-
-app.get("/kitchen", (req, res) => {
-    
- })
-
- app.get("/blogs", (req, res) => {
-    
-    Blog.find({}, (err, blogs) => {
-        if (err) {
-          console.error("Error finding blogs:", err);
-          return;
-        }
-        
-        // Store the data in JSON format
-        const jsonData = blogs.map(blog => ({
-          title: blog.title,
-          text: blog.text
-        }));
-      
-        console.log(jsonData); // Output the JSON data
-      });
-
- })
-
-app.get("/logout", async(req, res) => {
+app.post("/addblog",async (req, res) => {
     try {
+        // Extract title and text from request body
+        const { title, description } = req.body;
+    
+        // Create a new instance of the Blog model
+        const newBlog = new Blog({
+          title: title,
+          text: description
+        });
+        //console.log("saved")
+        // Save the new blog post to the database
+        await newBlog.save();
+    
+        // Send a success response
+        res.status(201).send("Blog post added successfully");
+      } catch (err) {
+        console.error("Error adding blog post:", err);
+        res.status(500).send("Internal Server Error");
+      }
 
-        if(req.cookies.jwt){
-         res.clearCookie("jwt");
-         res.send("<script> alert('logged out succesfully'); window.location = '/login' </script>")
-        }else{
-            res.send("<script> alert('You are no longer logged in'); window.location = '/' </script>")
-        }
-        //  res.render('login.hbs');
-    } catch (error) {
-         res.status(500).send(error);
-    }
+
  })
+// app.get("/kitchen", (req, res) => {
+
+
+//  })
+app.get("/blogs", async (req, res) => {
+
+    console.log("ok");
+    try {
+      const blogs = await Blog.find({});
+      //console.log(blogs);
+      // Store the data in JSON format
+      const jsonData = blogs.map(blog => ({
+        title: blog.title,
+        text: blog.text
+      }));
+      
+      // Send the JSON data as the response
+      res.json(jsonData);
+    } catch (err) {
+      console.error("Error finding blogs:", err);
+      res.status(500).send("Internal Server Error"); // Send an error response if there's an error
+    }
+  });
+
+  app.post("/products", async (req, res) => {
+    try {
+      const { type, minPrice, maxPrice } = req.body;
+  
+      // Build the query based on the constraints
+      const query = {
+        type: type,
+        price: { $gte: minPrice, $lte: maxPrice }
+      };
+  
+      // Find products that satisfy the constraints
+      const products = await Product.find(query);
+  
+      // Send the filtered products as a JSON response
+      res.json(products);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      res.status(500).send("Internal Server Error");
+    }
+  });
+  
+  
 
 
 
@@ -113,10 +139,10 @@ app.get("/logout", async(req, res) => {
 
 
 
-app.get("*", (req, res) => {
-    res.send("Error 404 Invalid Endpoint");
-})
-app.listen(port, () => {
-    console.log(`Server is running in port no ${port}`);
-})
+
+
+
+// app.get("*", (req, res) => {
+//     res.send("Error 404 Invalid Endpoint");
+// })
 
