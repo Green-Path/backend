@@ -18,7 +18,7 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true}))
 const port = process.env.PORT || 5000;
 
-mongoose.connect("mongodb://127.0.0.1:27017/Randome")
+mongoose.connect("mongodb+srv://theshekhargupta125:Shekhargupta125@cluster0.rba8f2y.mongodb.net/greenpath")
   .then(() => {
     console.log('Connected to MongoDB');
   })
@@ -26,33 +26,17 @@ mongoose.connect("mongodb://127.0.0.1:27017/Randome")
       console.error('Error connecting to MongoDB:', err);
     });
     
-    app.listen(port, () => {
-        console.log(`Server is running in port no ${port}`);
-    })
-    
+app.listen(port, () => {
+    console.log(`Server is running in port no ${port}`);
+})
+
     
     
     // const users = require("./models/users")
     const Blog = require("./models/Blogs")
     const Product = require("./models/products")
+    const appliance = require("./models/appliances")
     
-    
-    
-    
-    
-    // const productroute=require("./routes/productroute");
-    
-    
-    // // app.use("/login", loginroute);
-    // // app.use("/register", registerroute);
-    // // app.use("/home", homeroute);
-    
-    // // app.use("/myprofile", myprofileroute);
-    
-    // // app.use("/edit_profile", edit_profile_route);
-    // // app.use("/saved_jobs", savelistroute);
-    
-    // app.use("/products",productroute);
 
 
 
@@ -109,24 +93,24 @@ app.get("/blogs", async (req, res) => {
 
   app.post("/products", async (req, res) => {
     try {
-      const { type, minPrice, maxPrice } = req.body;
-  
-      // Build the query based on the constraints
-      const query = {
-        type: type,
-        price: { $gte: minPrice, $lte: maxPrice }
-      };
-  
-      // Find products that satisfy the constraints
-      const products = await Product.find(query);
-  
-      // Send the filtered products as a JSON response
-      res.json(products);
+        const { type, minPrice, maxPrice } = req.body;
+
+        // Build the query based on the constraints
+        const query = {
+            type: type,
+            price: { $gte: minPrice, $lte: maxPrice }
+        };
+        // Find products that satisfy the constraints and sort them by price in ascending order
+        const products = await Product.find(query).sort({ price: 1 });
+
+        console.log(products);
+        res.json(products);
     } catch (error) {
-      console.error("Error fetching products:", error);
-      res.status(500).send("Internal Server Error");
+        console.error("Error fetching products:", error);
+        res.status(500).send("Internal Server Error");
     }
-  });
+});
+
   
   
 
