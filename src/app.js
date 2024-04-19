@@ -121,7 +121,7 @@ app.post("/appliances", async (req, res) => {
           price: { $gte: minPrice, $lte: maxPrice }
       };
       // Find products that satisfy the constraints and sort them by price in ascending order
-      const products = await appliance.find(query).sort({ PowerRating: 1 });
+      const products = await appliance.find(query).sort({ PowerRating: -1 });
 
       console.log(products);
       res.json(products);
