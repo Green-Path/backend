@@ -23,6 +23,7 @@ const ProductSchema = new mongoose.Schema({
     }
 });
 
+
 // Create a model from the schema
 const appliance = mongoose.model("appliance", ProductSchema);
 

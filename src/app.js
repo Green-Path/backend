@@ -111,6 +111,25 @@ app.get("/blogs", async (req, res) => {
     }
 });
 
+app.post("/appliances", async (req, res) => {
+  try {
+      const { type, minPrice, maxPrice } = req.body;
+      console.log(type);
+      // Build the query based on the constraints
+      const query = {
+          type: type,
+          price: { $gte: minPrice, $lte: maxPrice }
+      };
+      // Find products that satisfy the constraints and sort them by price in ascending order
+      const products = await appliance.find(query).sort({ PowerRating: 1 });
+
+      console.log(products);
+      res.json(products);
+  } catch (error) {
+      console.error("Error fetching products:", error);
+      res.status(500).send("Internal Server Error");
+  }
+});
   
   
 
